@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharma Competitive Landscape: Immunology & ID</title>
+<style>
+  :root {
+    --navy: #0f2140;
+    --navy-mid: #1a3358;
+    --navy-light: #243f6e;
+    --accent: #2e7dd1;
+    --accent-light: #4b9ae0;
+    --teal: #0d9488;
+    --gold: #d97706;
+    --red: #dc2626;
+    --green: #16a34a;
+    --orange: #ea580c;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --border: #dde3ee;
+    --text: #1a2540;
+    --muted: #5a6a85;
+    --tag-bg: #e8edf7;
+    --pill-r: 4px;
+    --shadow: 0 1px 4px rgba(15,33,64,.10);
+    --shadow-md: 0 3px 12px rgba(15,33,64,.13);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+  /* ── Layout ── */
+  #shell { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: 220px; flex-shrink: 0; background: var(--navy);
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .logo { padding: 22px 18px 16px; border-bottom: 1px solid var(--navy-light); }
+  .logo h1 { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .4px; line-height: 1.4; }
+  .logo .sub { font-size: 10px; color: #8ba3cc; margin-top: 3px; letter-spacing: .2px; }
+  .logo .badge { display: inline-block; margin-top: 8px; background: var(--accent); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+
+  nav { padding: 12px 10px; flex: 1; }
+  nav a {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 10px; border-radius: 6px; color: #9ab3d4;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    transition: background .15s, color .15s; cursor: pointer;
+  }
+  nav a:hover, nav a.active { background: var(--navy-light); color: #fff; }
+  nav a .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-section { font-size: 10px; font-weight: 700; color: #4d6a96; letter-spacing: 1px; text-transform: uppercase; padding: 14px 10px 4px; }
+
+  .meta-footer { padding: 14px 14px 18px; border-top: 1px solid var(--navy-light); }
+  .meta-footer .last-updated { font-size: 10px; color: #6080a8; }
+
+  /* ── Main ── */
+  #main { flex: 1; min-width: 0; }
+
+  .page-header {
+    background: var(--navy); color: #fff; padding: 28px 36px 24px;
+    border-bottom: 3px solid var(--accent);
+  }
+  .page-header h2 { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+  .page-header p { font-size: 13px; color: #8ba3cc; margin-top: 4px; }
+
+  .content { padding: 28px 36px; }
+
+  /* ── Sections ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Pipeline ── */
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-right: 2px; }
+  select, input[type=search] {
+    padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; color: var(--text); background: #fff; outline: none;
+  }
+  select:focus, input[type=search]:focus { border-color: var(--accent); }
+
+  .phase-block { margin-bottom: 28px; }
+  .phase-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .phase-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    letter-spacing: .2px; white-space: nowrap;
+  }
+  .ph-marketed   { background: #dcfce7; color: #166534; }
+  .ph-nda        { background: #dbeafe; color: #1e40af; }
+  .ph-phase3     { background: #ede9fe; color: #5b21b6; }
+  .ph-phase23    { background: #fce7f3; color: #9d174d; }
+  .ph-phase2     { background: #fef3c7; color: #92400e; }
+  .ph-phase12    { background: #ffedd5; color: #9a3412; }
+  .ph-phase1     { background: #fee2e2; color: #991b1b; }
+  .ph-preclinical{ background: #f3f4f6; color: #374151; }
+
+  .phase-count { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  .pipeline-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .pipeline-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px; box-shadow: var(--shadow);
+    transition: box-shadow .15s; position: relative;
+  }
+  .pipeline-card:hover { box-shadow: var(--shadow-md); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+  .asset-name { font-size: 14px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+  .company-tag { font-size: 10px; font-weight: 600; background: var(--tag-bg); color: var(--accent); padding: 2px 7px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  .mechanism { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  .indication { font-size: 12px; color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  .risk-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .risk-low     { background: #dcfce7; color: #166534; }
+  .risk-low-med { background: #d1fae5; color: #065f46; }
+  .risk-medium  { background: #fef3c7; color: #92400e; }
+  .risk-high    { background: #fee2e2; color: #991b1b; }
+  .risk-very-high { background: #fce7f3; color: #9d174d; }
+
+  .pos-pill { font-size: 10px; color: var(--muted); background: var(--tag-bg); padding: 2px 7px; border-radius: 10px; }
+  .area-pill { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+  .area-immuno { background: #ede9fe; color: #5b21b6; }
+  .area-id     { background: #dbeafe; color: #1e3a8a; }
+
+  .expected-data { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  /* ── Events ── */
+  .events-grid { display: grid; gap: 14px; }
+  .event-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 20px; box-shadow: var(--shadow); display: flex; gap: 16px;
+  }
+  .event-date-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+  .event-date-badge {
+    background: var(--navy); color: #fff; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px; white-space: nowrap;
+  }
+  .event-body { flex: 1; }
+  .event-headline { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 6px; line-height: 1.4; }
+  .event-detail { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+  .event-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .etag { font-size: 11px; background: var(--tag-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; }
+  .etag-company { background: #e0f2fe; color: #0369a1; }
+
+  /* ── Implications ── */
+  .impl-grid { display: grid; gap: 16px; }
+  .impl-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 20px 22px; box-shadow: var(--shadow);
+    border-left: 4px solid var(--accent);
+  }
+  .impl-card.high { border-left-color: var(--gold); }
+  .impl-card.transformative { border-left-color: var(--teal); }
+  .impl-card.medium { border-left-color: var(--accent); }
+  .impl-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .impl-theme { font-size: 16px; font-weight: 700; color: var(--navy); line-height: 1.4; flex: 1; }
+  .impact-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px; flex-shrink: 0; }
+  .impact-high          { background: #fef3c7; color: #92400e; }
+  .impact-transformative{ background: #ccfbf1; color: #065f46; }
+  .impact-medium        { background: #dbeafe; color: #1e40af; }
+  .impl-body { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
+  .impl-companies { display: flex; flex-wrap: wrap; gap: 6px; }
+  .impl-co { font-size: 11px; background: var(--tag-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; }
+
+  /* ── Commentary ── */
+  .commentary-grid { display: grid; gap: 20px; }
+  .commentary-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .commentary-header {
+    background: var(--navy); color: #fff; padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  }
+  .commentary-company { font-size: 18px; font-weight: 800; letter-spacing: -.3px; }
+  .commentary-headline { font-size: 13px; color: #8ba3cc; margin-top: 3px; line-height: 1.4; flex: 1; }
+  .rating-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 10px; flex-shrink: 0; }
+  .rating-strong { background: #dcfce7; color: #166534; }
+  .rating-stable { background: #dbeafe; color: #1e40af; }
+  .rating-transition { background: #fef3c7; color: #92400e; }
+  .commentary-body { padding: 18px 20px; }
+  .commentary-text { font-size: 13px; color: var(--muted); line-height: 1.75; }
+  .commentary-risk { margin-top: 12px; display: flex; align-items: center; gap: 8px; }
+  .risk-label { font-size: 12px; font-weight: 600; color: var(--text); }
+
+  /* ── LOE Watchlist table ── */
+  .table-wrap { overflow-x: auto; margin-top: 6px; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead { background: var(--navy); color: #fff; }
+  thead th { padding: 10px 12px; text-align: left; font-weight: 600; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f7f9fd; }
+  tbody td { padding: 9px 12px; vertical-align: top; }
+  .threat-critical { color: var(--red); font-weight: 700; }
+  .threat-high     { color: var(--orange); font-weight: 600; }
+  .threat-low      { color: var(--green); font-weight: 600; }
+  .threat-low-med  { color: var(--teal); font-weight: 600; }
+  .threat-already  { color: #6b7280; font-style: italic; }
+
+  /* ── Section header ── */
+  .section-title { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 4px; letter-spacing: -.3px; }
+  .section-desc  { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .divider       { height: 1px; background: var(--border); margin: 30px 0; }
+
+  /* ── Summary stats bar ── */
+  .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-pill {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 16px; display: flex; flex-direction: column; align-items: center;
+    min-width: 100px; box-shadow: var(--shadow);
+  }
+  .stat-num { font-size: 22px; font-weight: 800; color: var(--navy); }
+  .stat-lbl { font-size: 11px; color: var(--muted); font-weight: 500; text-align: center; margin-top: 1px; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #c4cede; border-radius: 3px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    #sidebar { display: none; }
+    .content { padding: 16px; }
+    .page-header { padding: 18px 16px; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="shell">
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="logo">
+      <h1>Pharma Competitive<br>Landscape</h1>
+      <div class="sub">Immunology &amp; Infectious Disease</div>
+      <div class="badge" id="sidebar-updated">Loading…</div>
+    </div>
+    <nav>
+      <div class="nav-section">Views</div>
+      <a class="active" onclick="showSection('pipeline')" id="nav-pipeline">
+        <span class="icon">🧬</span> Pipeline by Phase
+      </a>
+      <a onclick="showSection('events')" id="nav-events">
+        <span class="icon">📰</span> Key Recent Events
+      </a>
+      <a onclick="showSection('implications')" id="nav-implications">
+        <span class="icon">💡</span> Implications
+      </a>
+      <a onclick="showSection('commentary')" id="nav-commentary">
+        <span class="icon">💬</span> Strategy &amp; Execution
+      </a>
+      <div class="nav-section">Data</div>
+      <a onclick="showSection('marketed')" id="nav-marketed">
+        <span class="icon">💊</span> Marketed Products
+      </a>
+      <a onclick="showSection('loe')" id="nav-loe">
+        <span class="icon">⚠️</span> LOE Watchlist
+      </a>
+      <a onclick="showSection('companies')" id="nav-companies">
+        <span class="icon">🏢</span> Company Overview
+      </a>
+    </nav>
+    <div class="meta-footer">
+      <div class="last-updated" id="sidebar-meta">Data as of Q1 2026</div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main id="main">
+    <div class="page-header">
+      <h2 id="header-title">Pharma &amp; Biotech Competitive Landscape</h2>
+      <p id="header-sub">Immunology &amp; Infectious Disease | Top 20 Companies | Pipeline + Marketed Products</p>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ PIPELINE ══ -->
+      <section class="section active" id="section-pipeline">
+        <div class="section-title">Pipeline by Phase</div>
+        <div class="section-desc">All pipeline assets across immunology and infectious disease, grouped by development stage.</div>
+
+        <div id="pipeline-stats" class="stats-bar"></div>
+
+        <div class="filters">
+          <span class="filter-label">Filter:</span>
+          <input type="search" id="search-pipeline" placeholder="Search asset, company, indication…" style="min-width:220px">
+          <select id="filter-company"><option value="">All Companies</option></select>
+          <select id="filter-area"><option value="">All Areas</option><option>Immunology</option><option>Infectious Disease</option></select>
+          <select id="filter-phase"><option value="">All Phases</option></select>
+        </div>
+
+        <div id="pipeline-container"></div>
+      </section>
+
+      <!-- ══ EVENTS ══ -->
+      <section class="section" id="section-events">
+        <div class="section-title">Key Recent Events</div>
+        <div class="section-desc">Major milestones, approvals, data readouts, and market-moving developments — updated weekly.</div>
+        <div id="events-container" class="events-grid"></div>
+      </section>
+
+      <!-- ══ IMPLICATIONS ══ -->
+      <section class="section" id="section-implications">
+        <div class="section-title">Implications</div>
+        <div class="section-desc">Structural themes and strategic implications arising from current competitive dynamics.</div>
+        <div id="implications-container" class="impl-grid"></div>
+      </section>
+
+      <!-- ══ COMMENTARY ══ -->
+      <section class="section" id="section-commentary">
+        <div class="section-title">Strategy &amp; Execution Commentary</div>
+        <div class="section-desc">Company-by-company assessment of pipeline execution, commercial performance, and strategic positioning.</div>
+        <div id="commentary-container" class="commentary-grid"></div>
+      </section>
+
+      <!-- ══ MARKETED ══ -->
+      <section class="section" id="section-marketed">
+        <div class="section-title">Marketed Products</div>
+        <div class="section-desc">Approved immunology &amp; ID products with 2025 revenue, LOE dates, and biosimilar/generic competitive threat.</div>
+        <div class="table-wrap">
+          <table id="marketed-table">
+            <thead>
+              <tr>
+                <th>Company</th><th>Product</th><th>Area</th><th>Mechanism</th>
+                <th>2025 Revenue (USDbn)</th><th>LOE Date</th><th>Biosimilar Applicants</th><th>Threat Level</th>
+              </tr>
+            </thead>
+            <tbody id="marketed-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══ LOE ══ -->
+      <section class="section" id="section-loe">
+        <div class="section-title">LOE &amp; Biosimilar Watchlist</div>
+        <div class="section-desc">Key loss-of-exclusivity events and biosimilar/generic competitive threats ranked by urgency.</div>
+        <div class="table-wrap">
+          <table id="loe-table">
+            <thead>
+              <tr>
+                <th>Product</th><th>Company</th><th>US LOE</th><th>EU LOE</th>
+                <th>Revenue at Risk</th><th>Biosimilar Applicants</th><th>Priority Action</th>
+              </tr>
+            </thead>
+            <tbody id="loe-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══ COMPANIES ══ -->
+      <section class="section" id="section-companies">
+        <div class="section-title">Company Overview</div>
+        <div class="section-desc">Top 20 pharma &amp; biotech companies by market cap with immunology &amp; ID revenue and LOE profile.</div>
+        <div class="table-wrap">
+          <table id="company-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Company</th><th>Ticker</th><th>Mkt Cap (USDbn)</th>
+                <th>Immuno Focus</th><th>ID Focus</th>
+                <th>2025 Immuno Rev</th><th>2025 ID Rev</th><th>Key LOE Risk</th>
+              </tr>
+            </thead>
+            <tbody id="company-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+let DATA = null;
+
+const PHASE_ORDER = [
+  "Marketed", "NDA/BLA Submitted", "NDA/BLA/MAA Submitted",
+  "Phase 3", "Phase 2/3", "Phase 2", "Phase 1/2", "Phase 1",
+  "Preclinical", "Marketed / Phase 3 label expansion",
+  "Marketed – declining", "Phase 3 (Pivotal)", "Phase 2 (PoC)"
+];
+
+const PHASE_CANONICAL = {
+  "Marketed": "Marketed",
+  "Marketed / Phase 3 label expansion": "Marketed",
+  "Marketed – declining": "Marketed",
+  "NDA/BLA Submitted": "NDA/BLA Submitted",
+  "NDA/BLA/MAA Submitted": "NDA/BLA Submitted",
+  "Phase 3": "Phase 3",
+  "Phase 3 (Pivotal)": "Phase 3",
+  "Phase 2/3": "Phase 2/3",
+  "Phase 2": "Phase 2",
+  "Phase 2 (PoC)": "Phase 2",
+  "Phase 1/2": "Phase 1/2",
+  "Phase 1": "Phase 1",
+  "Preclinical": "Preclinical",
+  "Speculative": "Preclinical",
+};
+
+function canonicalPhaseFull(p) {
+  if (!p) return "Other";
+  for (const [k,v] of Object.entries(PHASE_CANONICAL)) {
+    if (p.includes(k)) return v;
+  }
+  if (p.toLowerCase().includes("market")) return "Marketed";
+  if (p.toLowerCase().includes("nda") || p.toLowerCase().includes("bla") || p.toLowerCase().includes("maa")) return "NDA/BLA Submitted";
+  if (p.includes("3")) return "Phase 3";
+  if (p.includes("2/3")) return "Phase 2/3";
+  if (p.includes("2")) return "Phase 2";
+  if (p.includes("1/2")) return "Phase 1/2";
+  if (p.includes("1")) return "Phase 1";
+  return "Preclinical";
+}
+
+const PHASE_BADGE_CLASS = {
+  "Marketed": "ph-marketed",
+  "NDA/BLA Submitted": "ph-nda",
+  "Phase 3": "ph-phase3",
+  "Phase 2/3": "ph-phase23",
+  "Phase 2": "ph-phase2",
+  "Phase 1/2": "ph-phase12",
+  "Phase 1": "ph-phase1",
+  "Preclinical": "ph-preclinical",
+};
+
+const PHASE_DISPLAY_ORDER = [
+  "Marketed","NDA/BLA Submitted","Phase 3","Phase 2/3","Phase 2","Phase 1/2","Phase 1","Preclinical"
+];
+
+function canonicalPhase(p) {
+  return canonicalPhaseFull(p);
+}
+
+function riskClass(r) {
+  if (!r) return "";
+  const rl = r.toLowerCase();
+  if (rl.includes("very high")) return "risk-very-high";
+  if (rl.includes("high"))      return "risk-high";
+  if (rl.includes("low-medium") || rl.includes("low–medium")) return "risk-low-med";
+  if (rl.includes("low"))       return "risk-low";
+  if (rl.includes("medium"))    return "risk-medium";
+  if (rl.includes("speculative")) return "risk-very-high";
+  return "";
+}
+
+function impactClass(i) {
+  if (!i) return "";
+  const il = i.toLowerCase();
+  if (il.includes("transform")) return "transformative";
+  if (il.includes("high"))      return "high";
+  return "medium";
+}
+
+function threatClass(t) {
+  if (!t) return "";
+  const tl = t.toLowerCase();
+  if (tl.includes("critical"))  return "threat-critical";
+  if (tl.includes("already"))   return "threat-already";
+  if (tl.includes("high"))      return "threat-high";
+  if (tl.includes("low-medium") || tl.includes("low–medium")) return "threat-low-med";
+  if (tl.includes("low"))       return "threat-low";
+  return "";
+}
+
+function ratingClass(r) {
+  if (!r) return "";
+  const rl = r.toLowerCase();
+  if (rl.includes("strong")) return "rating-strong";
+  if (rl.includes("stable")) return "rating-stable";
+  return "rating-transition";
+}
+
+function esc(s) {
+  return String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+function showSection(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+  document.getElementById("section-" + id).classList.add("active");
+  document.getElementById("nav-" + id).classList.add("active");
+}
+
+// ── Pipeline ──────────────────────────────────────────────
+function buildPipeline() {
+  const pipeline = DATA.pipeline || [];
+
+  // Populate company filter
+  const companies = [...new Set(pipeline.map(d=>d.company))].sort();
+  const compSel = document.getElementById("filter-company");
+  companies.forEach(c => {
+    const o = document.createElement("option"); o.value=c; o.textContent=c; compSel.appendChild(o);
+  });
+
+  // Populate phase filter
+  const phases = PHASE_DISPLAY_ORDER;
+  const phaseSel = document.getElementById("filter-phase");
+  phases.forEach(p => {
+    const o = document.createElement("option"); o.value=p; o.textContent=p; phaseSel.appendChild(o);
+  });
+
+  // Stats
+  const marketed = pipeline.filter(d=>canonicalPhase(d.phase)==="Marketed").length;
+  const ph3      = pipeline.filter(d=>canonicalPhase(d.phase)==="Phase 3").length;
+  const ph2      = pipeline.filter(d=>["Phase 2","Phase 2/3"].includes(canonicalPhase(d.phase))).length;
+  const ph1      = pipeline.filter(d=>["Phase 1","Phase 1/2"].includes(canonicalPhase(d.phase))).length;
+  document.getElementById("pipeline-stats").innerHTML = `
+    <div class="stat-pill"><div class="stat-num">${pipeline.length}</div><div class="stat-lbl">Total Assets</div></div>
+    <div class="stat-pill"><div class="stat-num">${marketed}</div><div class="stat-lbl">Marketed</div></div>
+    <div class="stat-pill"><div class="stat-num">${ph3}</div><div class="stat-lbl">Phase 3</div></div>
+    <div class="stat-pill"><div class="stat-num">${ph2}</div><div class="stat-lbl">Phase 2 / 2/3</div></div>
+    <div class="stat-pill"><div class="stat-num">${ph1}</div><div class="stat-lbl">Phase 1 / 1/2</div></div>
+    <div class="stat-pill"><div class="stat-num">${companies.length}</div><div class="stat-lbl">Companies</div></div>
+  `;
+
+  function render() {
+    const q      = document.getElementById("search-pipeline").value.toLowerCase();
+    const comp   = document.getElementById("filter-company").value;
+    const area   = document.getElementById("filter-area").value;
+    const phase  = document.getElementById("filter-phase").value;
+
+    let filtered = pipeline.filter(d => {
+      const text = [d.company,d.asset,d.mechanism,d.indication,d.target].join(" ").toLowerCase();
+      if (q && !text.includes(q)) return false;
+      if (comp && d.company !== comp) return false;
+      if (area && d.area !== area) return false;
+      if (phase && canonicalPhase(d.phase) !== phase) return false;
+      return true;
+    });
+
+    // Group by canonical phase
+    const groups = {};
+    PHASE_DISPLAY_ORDER.forEach(p => groups[p] = []);
+    filtered.forEach(d => {
+      const cp = canonicalPhase(d.phase);
+      if (!groups[cp]) groups[cp] = [];
+      groups[cp].push(d);
+    });
+
+    let html = "";
+    PHASE_DISPLAY_ORDER.forEach(ph => {
+      const assets = groups[ph];
+      if (!assets || assets.length === 0) return;
+      const cls = PHASE_BADGE_CLASS[ph] || "ph-preclinical";
+      html += `<div class="phase-block">
+        <div class="phase-header">
+          <span class="phase-badge ${cls}">${esc(ph)}</span>
+          <span class="phase-count">${assets.length} asset${assets.length!==1?"s":""}</span>
+        </div>
+        <div class="pipeline-grid">`;
+      assets.forEach(d => {
+        const areaCls = d.area==="Immunology" ? "area-immuno" : "area-id";
+        const areaLbl = d.area==="Immunology" ? "Immuno" : "ID";
+        const rc = riskClass(d.risk_profile);
+        const shortRisk = (d.risk_profile||"").split("–")[0].trim();
+        const pos = d.pos ? `<span class="pos-pill">PoS ${esc(d.pos)}</span>` : "";
+        const expData = d.expected_data && d.expected_data !== "N/A" ?
+          `<div class="expected-data">📅 ${esc(d.expected_data)}</div>` : "";
+        const rev = d.revenue_2025 && d.revenue_2025 !== "0" ?
+          `<span class="pos-pill">2025: $${esc(d.revenue_2025)}B</span>` : "";
+        html += `<div class="pipeline-card">
+          <div class="card-top">
+            <div class="asset-name">${esc(d.asset)}</div>
+            <span class="company-tag">${esc(d.company)}</span>
+          </div>
+          <div class="mechanism">${esc(d.mechanism)}</div>
+          <div class="indication">${esc(d.indication)}</div>
+          <div class="card-meta">
+            <span class="area-pill ${areaCls}">${areaLbl}</span>
+            ${rc ? `<span class="risk-badge ${rc}">${esc(shortRisk)}</span>` : ""}
+            ${pos}
+            ${rev}
+          </div>
+          ${expData}
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+
+    if (!html) html = `<div style="color:var(--muted);padding:30px 0;text-align:center;">No assets match the current filters.</div>`;
+    document.getElementById("pipeline-container").innerHTML = html;
+  }
+
+  ["search-pipeline","filter-company","filter-area","filter-phase"].forEach(id =>
+    document.getElementById(id).addEventListener("input", render)
+  );
+  render();
+}
+
+// ── Events ────────────────────────────────────────────────
+function buildEvents() {
+  const events = DATA.editorial.key_recent_events || [];
+  let html = "";
+  events.forEach(e => {
+    const tags = (e.tags||[]).map(t=>`<span class="etag">${esc(t)}</span>`).join("");
+    const cos  = (e.companies||[]).map(c=>`<span class="etag etag-company">${esc(c)}</span>`).join("");
+    html += `<div class="event-card">
+      <div class="event-date-col">
+        <div class="event-date-badge">${esc(e.date)}</div>
+      </div>
+      <div class="event-body">
+        <div class="event-headline">${esc(e.headline)}</div>
+        <div class="event-detail">${esc(e.detail)}</div>
+        <div class="event-tags">${cos}${tags}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById("events-container").innerHTML = html || "<p>No events data.</p>";
+}
+
+// ── Implications ──────────────────────────────────────────
+function buildImplications() {
+  const impl = DATA.editorial.implications || [];
+  let html = "";
+  impl.forEach(i => {
+    const ic  = impactClass(i.impact);
+    const cos = (i.companies_affected||[]).map(c=>`<span class="impl-co">${esc(c)}</span>`).join("");
+    const impBadgeCls = ic==="transformative" ? "impact-transformative" : ic==="high" ? "impact-high" : "impact-medium";
+    html += `<div class="impl-card ${ic}">
+      <div class="impl-top">
+        <div class="impl-theme">${esc(i.theme)}</div>
+        <span class="impact-badge ${impBadgeCls}">${esc(i.impact)} Impact</span>
+      </div>
+      <div class="impl-body">${esc(i.body)}</div>
+      ${cos ? `<div class="impl-companies">${cos}</div>` : ""}
+    </div>`;
+  });
+  document.getElementById("implications-container").innerHTML = html || "<p>No implications data.</p>";
+}
+
+// ── Commentary ────────────────────────────────────────────
+function buildCommentary() {
+  const coms = DATA.editorial.commentary || [];
+  let html = "";
+  coms.forEach(c => {
+    const rc = ratingClass(c.rating);
+    html += `<div class="commentary-card">
+      <div class="commentary-header">
+        <div>
+          <div class="commentary-company">${esc(c.company)}</div>
+          <div class="commentary-headline">${esc(c.headline)}</div>
+        </div>
+        <span class="rating-badge ${rc}">${esc(c.rating)}</span>
+      </div>
+      <div class="commentary-body">
+        <div class="commentary-text">${esc(c.body)}</div>
+        <div class="commentary-risk">
+          <span class="risk-label">Risk Level:</span>
+          <span class="risk-badge ${riskClass("risk-" + (c.risk||"").toLowerCase())}">${esc(c.risk)}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById("commentary-container").innerHTML = html || "<p>No commentary data.</p>";
+}
+
+// ── Marketed Products ─────────────────────────────────────
+function buildMarketed() {
+  const products = DATA.marketed_products || [];
+  let html = "";
+  products.forEach(p => {
+    const tc = threatClass(p.threat_level);
+    const shortThreat = (p.threat_level||"").split("–")[0].trim().split("(")[0].trim();
+    html += `<tr>
+      <td><strong>${esc(p.company)}</strong></td>
+      <td>${esc(p.product)}</td>
+      <td>${esc(p.therapeutic_area)}</td>
+      <td>${esc(p.mechanism)}</td>
+      <td>${esc(p.revenue_2025)}</td>
+      <td>${esc(p.loe_date)}</td>
+      <td style="max-width:200px;font-size:11px;">${esc(p.biosimilar_applicants)}</td>
+      <td><span class="${tc}">${esc(shortThreat)}</span></td>
+    </tr>`;
+  });
+  document.getElementById("marketed-body").innerHTML = html;
+}
+
+// ── LOE Watchlist ─────────────────────────────────────────
+function buildLOE() {
+  const loe = DATA.loe_watchlist || [];
+  let html = "";
+  loe.forEach(l => {
+    html += `<tr>
+      <td><strong>${esc(l.product)}</strong></td>
+      <td>${esc(l.company)}</td>
+      <td>${esc(l.us_loe)}</td>
+      <td>${esc(l.eu_loe)}</td>
+      <td>${esc(l.revenue_impact)}</td>
+      <td style="max-width:220px;font-size:11px;">${esc(l.biosimilar_applicants)}</td>
+      <td style="font-size:11px;font-style:italic;color:var(--muted);">${esc(l.action)}</td>
+    </tr>`;
+  });
+  document.getElementById("loe-body").innerHTML = html;
+}
+
+// ── Company Overview ──────────────────────────────────────
+function buildCompanies() {
+  const cos = DATA.companies || [];
+  let html = "";
+  cos.forEach(c => {
+    html += `<tr>
+      <td>${esc(c.rank)}</td>
+      <td><strong>${esc(c.company)}</strong></td>
+      <td style="font-weight:600;color:var(--accent);">${esc(c.ticker)}</td>
+      <td style="text-align:right;">${esc(c.market_cap_bn)}</td>
+      <td style="max-width:200px;font-size:12px;">${esc(c.immuno_focus)}</td>
+      <td style="max-width:150px;font-size:12px;">${esc(c.id_focus)}</td>
+      <td>${esc(c.immuno_revenue)}</td>
+      <td>${esc(c.id_revenue)}</td>
+      <td style="max-width:180px;font-size:11px;color:var(--muted);">${esc(c.loe_risk)}</td>
+    </tr>`;
+  });
+  document.getElementById("company-body").innerHTML = html;
+}
+
+// ── Init ──────────────────────────────────────────────────
+async function init() {
+  try {
+    const resp = await fetch("data/data.json");
+    DATA = await resp.json();
+  } catch(e) {
+    document.getElementById("pipeline-container").innerHTML =
+      `<div style="color:red;padding:20px;">Failed to load data.json: ${e.message}</div>`;
+    return;
+  }
+
+  const updated = DATA.meta?.last_updated || "";
+  document.getElementById("sidebar-updated").textContent = "Updated " + updated;
+  document.getElementById("sidebar-meta").textContent = "Data as of " + (DATA.meta?.data_as_of || "");
+
+  buildPipeline();
+  buildEvents();
+  buildImplications();
+  buildCommentary();
+  buildMarketed();
+  buildLOE();
+  buildCompanies();
+}
+
+init();
+</script>
+</body>
+</html>

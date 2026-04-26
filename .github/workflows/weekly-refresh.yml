@@ -1,0 +1,44 @@
+name: Weekly Data Refresh
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"   # Every Monday at 7 AM UTC
+  workflow_dispatch:        # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write           # Required to commit updated data.json
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install anthropic requests openpyxl
+
+      - name: Run weekly data refresh
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/update_data.py --days-back 14
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet data/data.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push updated data
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/data.json
+          git commit -m "chore: weekly data refresh $(date -u +%Y-%m-%d)"
+          git push
